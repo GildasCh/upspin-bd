@@ -3,7 +3,6 @@ package cbz
 import (
 	"archive/zip"
 	"io"
-	"os"
 	"sort"
 	"strings"
 
@@ -15,13 +14,8 @@ type CBZ struct {
 	pages []*zip.File
 }
 
-func NewCBZ(f *os.File) (*CBZ, error) {
-	fi, err := f.Stat()
-	if err != nil {
-		return nil, errors.Wrap(err, "could not stat file")
-	}
-
-	r, err := zip.NewReader(f, fi.Size())
+func NewCBZ(f io.ReaderAt, size int64) (*CBZ, error) {
+	r, err := zip.NewReader(f, size)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create zip reader")
 	}
