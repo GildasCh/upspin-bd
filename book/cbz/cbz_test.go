@@ -12,8 +12,9 @@ import (
 )
 
 func TestNewCBZ(t *testing.T) {
-	f, _ := os.Open("mifune.zip")
-	c, err := NewCBZ(f)
+	f, _ := os.Open("test.cbz")
+	fi, _ := f.Stat()
+	c, err := NewCBZ(f, fi.Size())
 
 	require.NoError(t, err)
 	assert.NotNil(t, c.Reader)
@@ -23,38 +24,32 @@ func TestNewCBZ(t *testing.T) {
 		pages += f.FileHeader.Name + "\n"
 	}
 
-	expected := `mifune/3bf8c36bdeaf0785f43f83cc1987c57c--toshiro-mifune-red-beard.jpg
-mifune/58af6ed8a5a1a.image.jpg
-mifune/6-toshiro-mifune.w1200.h630.jpg
-mifune/85c2bae500bf8ae72d485aaeb9864014--toshiro-mifune-sexy-men.jpg
-mifune/9b74b5a06015f4f892d609c0e8cf6b03--rhys-davies-toshiro-mifune.jpg
-mifune/9e06faf13a655750ca93ed4b2b74987e--toshiro-mifune-man-style.jpg
-mifune/d4bdae14ac78527ae2e88c40df3ae8bf.jpg
-mifune/Image-Mifune-Senses-08.jpg
-mifune/mifune.jpg
-mifune/mifune_4_large.jpg
-mifune/Shubun_poster_Toshiro_Mifune.jpg
-mifune/toshiro-mifune-star-wars.jpg
-mifune/Toshiro_Mifune_EiganFan1952.jpg
+	expected := `mifune-free/01-Rashomon_poster_2.jpg
+mifune-free/11629986985_267f712523_b.jpg
+mifune-free/19971482_20b7f0fc5d_b.jpg
+mifune-free/Shubun_poster_Toshiro_Mifune.jpg
+mifune-free/toshiro_Mifune_character_in_filming_of_Hell_in_the_Pacific_4.jpg
+mifune-free/Toshiro_Mifune_wearing_bandana.jpg
 `
 
 	assert.Equal(t, expected, pages)
 }
 
 func TestPage(t *testing.T) {
-	f, _ := os.Open("mifune.zip")
-	c, err := NewCBZ(f)
+	f, _ := os.Open("test.cbz")
+	fi, _ := f.Stat()
+	c, err := NewCBZ(f, fi.Size())
 	require.NoError(t, err)
 
-	r, ok, err := c.Page(7)
+	r, ok, err := c.Page(3)
 	require.NoError(t, err)
 	require.True(t, ok)
 
 	b, err := ioutil.ReadAll(r)
 	require.NoError(t, err)
 
-	// sha1 sum of Image-Mifune-Senses-08.jpg
-	expected := "2802672c394b2dd7a5d71a5d268905c827dc7416"
+	// sha1 sum of Shubun_poster_Toshiro_Mifune.jpg
+	expected := "885cb5a39ef40fe0177e8571b10e0c4abf1e2c9e"
 
 	sum := sha1.Sum(b)
 	assert.Equal(t, expected, hex.EncodeToString(sum[:]))
