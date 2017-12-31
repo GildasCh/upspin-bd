@@ -83,3 +83,7 @@ func (c *CBZ) Page(i int) (io.ReadCloser, bool, error) {
 
 	return rc, true, nil
 }
+
+func (c *CBZ) Pages() int {
+	return len(c.pages)
+}

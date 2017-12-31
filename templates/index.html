@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <script src="https://unpkg.com/vue"></script>
+  </head>
+  <body>
+    <div id='app'>
+      <div tabindex="0" class='theater' v-bind:style="{ backgroundImage: 'url(' + theaterImage + ')' }" v-on:keydown.left="previous" v-on:keydown.right="next">
+      </div>
+    </div>
+
+    <script>
+      var resource = {{ .resource }};
+      var pages = {{ .pages }};
+    </script>
+    <script src='/static/app.js'></script>
+  </body>
+</html>

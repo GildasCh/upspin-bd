@@ -1,0 +1,27 @@
+ul.mosaic {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: 100px;
+    justify-content:space-evenly;
+}
+
+.mosaic li {
+    list-style-type: none;
+}
+
+.mosaic img {
+    height:240px;
+}
+
+.theater {
+    position:fixed;
+    top:0;
+    left:0;
+    height:100%;
+    width:100%;
+    background-color:black;
+    background-repeat:no-repeat;
+    background-size: contain;
+    background-position: center;
+}
