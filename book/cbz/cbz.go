@@ -2,11 +2,13 @@ package cbz
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
+	"upspin.io/upspin"
 )
 
 type CBZ struct {
@@ -21,6 +23,34 @@ func NewCBZ(f io.ReaderAt, size int64) (*CBZ, error) {
 	}
 
 	return &CBZ{Reader: r, pages: pages(r)}, nil
+}
+
+func NewCBZFromUpspin(pathName upspin.PathName,
+	open func(name upspin.PathName) (upspin.File, error),
+	lookup func(name upspin.PathName, followFinal bool) (*upspin.DirEntry, error)) (*CBZ, bool, error) {
+	f, err := open(pathName)
+	if err != nil {
+		fmt.Println(err)
+		return nil, false, err
+	}
+
+	de, err := lookup(pathName, true)
+	if err != nil {
+		fmt.Println(err)
+		return nil, false, err
+	}
+	size := int64(0)
+	for _, db := range de.Blocks {
+		size += db.Size
+	}
+
+	cb, err := NewCBZ(f, size)
+	if err != nil {
+		fmt.Println(err)
+		return nil, true, err
+	}
+
+	return cb, true, nil
 }
 
 func pages(r *zip.Reader) (pages []*zip.File) {

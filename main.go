@@ -31,7 +31,8 @@ func main() {
 
 	router.LoadHTMLFiles("templates/index.html")
 	router.GET("/read/*path", func(c *gin.Context) {
-		cb, ok, err := loadCBZ(client, c.Param("path"))
+		pathName := upspin.PathName(strings.TrimPrefix(c.Param("path"), "/"))
+		cb, ok, err := cbz.NewCBZFromUpspin(pathName, client.Open, client.Lookup)
 		if !ok {
 			c.Status(http.StatusBadRequest)
 			return
@@ -54,7 +55,8 @@ func main() {
 	})
 
 	router.GET("/load/*path", func(c *gin.Context) {
-		cb, ok, err := loadCBZ(client, c.Param("path"))
+		pathName := upspin.PathName(strings.TrimPrefix(c.Param("path"), "/"))
+		cb, ok, err := cbz.NewCBZFromUpspin(pathName, client.Open, client.Lookup)
 		if !ok {
 			c.Status(http.StatusBadRequest)
 			return
@@ -86,32 +88,4 @@ func main() {
 	})
 
 	router.Run()
-}
-
-func loadCBZ(client upspin.Client, path string) (*cbz.CBZ, bool, error) {
-	pathName := upspin.PathName(strings.TrimPrefix(path, "/"))
-
-	f, err := client.Open(pathName)
-	if err != nil {
-		fmt.Println(err)
-		return nil, false, err
-	}
-
-	de, err := client.Lookup(pathName, true)
-	if err != nil {
-		fmt.Println(err)
-		return nil, false, err
-	}
-	size := int64(0)
-	for _, db := range de.Blocks {
-		size += db.Size
-	}
-
-	cb, err := cbz.NewCBZ(f, size)
-	if err != nil {
-		fmt.Println(err)
-		return nil, true, err
-	}
-
-	return cb, true, nil
 }
