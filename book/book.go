@@ -14,16 +14,25 @@ type Book interface {
 	Pages() int
 }
 
-func NewFromUpspin(path string, client upspin.Client) (Book, bool, error) {
-	// CBZ
-	if strings.HasSuffix(strings.ToLower(path), ".cbz") {
-		pathName := upspin.PathName(strings.TrimPrefix(path, "/"))
-		return cbz.NewCBZFromUpspin(pathName, client.Open, client.Lookup)
+func NewFromUpspin(path string, client upspin.Client, useCache bool) (b Book, ok bool, err error) {
+	if useCache {
+		if b, ok := cache[path]; ok {
+			return b, true, nil
+		}
 	}
 
-	// Directory
-	pattern := extractPattern(path)
-	return dir.NewDirFromUpspin(pattern, client.Glob, client.Open)
+	if strings.HasSuffix(strings.ToLower(path), ".cbz") {
+		// CBZ
+		pathName := upspin.PathName(strings.TrimPrefix(path, "/"))
+		b, ok, err = cbz.NewCBZFromUpspin(pathName, client.Open, client.Lookup)
+	} else {
+		// Directory
+		pattern := extractPattern(path)
+		b, ok, err = dir.NewDirFromUpspin(pattern, client.Glob, client.Open)
+	}
+
+	cacheUpdate(path, b, ok, err)
+	return
 }
 
 func extractPattern(in string) string {

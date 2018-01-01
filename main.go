@@ -30,7 +30,7 @@ func main() {
 	router.LoadHTMLFiles("templates/index.html")
 
 	router.GET("/read/*path", func(c *gin.Context) {
-		b, ok, err := book.NewFromUpspin(c.Param("path"), client)
+		b, ok, err := book.NewFromUpspin(c.Param("path"), client, true)
 		if !ok {
 			c.Status(http.StatusBadRequest)
 			return
@@ -53,7 +53,7 @@ func main() {
 	})
 
 	router.GET("/load/*path", func(c *gin.Context) {
-		b, ok, err := book.NewFromUpspin(c.Param("path"), client)
+		b, ok, err := book.NewFromUpspin(c.Param("path"), client, true)
 		if !ok {
 			c.Status(http.StatusBadRequest)
 			return
