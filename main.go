@@ -90,7 +90,7 @@ func main() {
 	})
 
 	router.GET("/dread/*pattern", func(c *gin.Context) {
-		pattern := strings.TrimPrefix(c.Param("pattern"), "/")
+		pattern := extractPattern(c.Param("pattern"))
 		d, ok, err := dir.NewDirFromUpspin(pattern, client.Glob, client.Open)
 		if !ok {
 			c.Status(http.StatusBadRequest)
@@ -114,7 +114,7 @@ func main() {
 	})
 
 	router.GET("/dload/*pattern", func(c *gin.Context) {
-		pattern := strings.TrimPrefix(c.Param("pattern"), "/")
+		pattern := extractPattern(c.Param("pattern"))
 		d, ok, err := dir.NewDirFromUpspin(pattern, client.Glob, client.Open)
 		if !ok {
 			c.Status(http.StatusBadRequest)
@@ -147,4 +147,12 @@ func main() {
 	})
 
 	router.Run()
+}
+
+func extractPattern(in string) string {
+	pattern := strings.TrimPrefix(in, "/")
+	if !strings.Contains(pattern, "*") {
+		pattern = strings.TrimSuffix(pattern, "/") + "/*"
+	}
+	return pattern
 }
