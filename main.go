@@ -41,9 +41,15 @@ func main() {
 			return
 		}
 
+		pages := []string{}
+		for i := 0; i < cb.Pages(); i++ {
+			pages = append(pages,
+				"/load"+c.Param("path")+"?page="+strconv.Itoa(i))
+		}
+
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"resource": "/load" + c.Param("path"),
-			"pages":    cb.Pages(),
+			"pages":    pages,
 		})
 	})
 

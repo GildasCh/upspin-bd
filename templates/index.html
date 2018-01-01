@@ -1,18 +1,42 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
-    <script src="https://unpkg.com/vue"></script>
+    <link rel="stylesheet" href="/static/css/blueimp-gallery.min.css">
   </head>
   <body>
-    <div id='app'>
-      <div tabindex="0" class='theater' v-bind:style="{ backgroundImage: 'url(' + theaterImage + ')' }" v-on:keydown.left="previous" v-on:keydown.right="next">
-      </div>
+    <div id="blueimp-gallery-carousel" class="blueimp-gallery blueimp-gallery-carousel" style='box-shadow:none;margin:0px;width:100%;height:100%;padding:0px;'>
+      <div class="slides"></div>
+      <h3 class="title"></h3>
+      <a class="prev">‹</a>
+      <a class="next">›</a>
+      <a class="play-pause"></a>
+      <ol class="indicator"></ol>
     </div>
 
+    <ul id='photos' style='display:none'>
+      {{ range $page := .pages }}
+      <li>
+        <a href='{{ $page }}'></a>
+      </li>
+      {{ end }}
+    </ul>
+
+    <script src="/static/blueimp-gallery.min.js"></script>
     <script>
-      var resource = {{ .resource }};
-      var pages = {{ .pages }};
+      blueimp.Gallery(
+       document.getElementById('photos').getElementsByTagName('a'),
+       {
+         container: '#blueimp-gallery-carousel',
+         stretchImages: true,
+         fullscreen: true,
+         closeOnEscape: false,
+         closeOnSlideClick: false,
+         closeOnSwipeUpOrDown: false,
+         disableScroll: false,
+         continuous: false,
+       }
+     );
     </script>
-    <script src='/static/app.js'></script>
+
   </body>
 </html>
