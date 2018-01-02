@@ -3,6 +3,7 @@ package dir
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 
 	"github.com/pkg/errors"
 	"upspin.io/upspin"
@@ -37,7 +38,7 @@ func NewDirFromUpspin(pattern string,
 	return &Dir{pages: pages}, true, nil
 }
 
-func (d *Dir) Page(i int) (io.ReadCloser, bool, error) {
+func (d *Dir) Page(i int) ([]byte, bool, error) {
 	if len(d.pages) <= i {
 		return nil, false, nil
 	}
@@ -46,8 +47,14 @@ func (d *Dir) Page(i int) (io.ReadCloser, bool, error) {
 	if err != nil {
 		return nil, true, errors.Wrap(err, "could not open file in dir")
 	}
+	defer rc.Close()
 
-	return rc, true, nil
+	bytes, err := ioutil.ReadAll(rc)
+	if err != nil {
+		return nil, true, errors.Wrap(err, "could not read whole file in cbz")
+	}
+
+	return bytes, true, nil
 }
 
 func (d *Dir) Pages() int {

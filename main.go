@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -70,18 +69,14 @@ func main() {
 			page = 0
 		}
 
-		rc, _, err := b.Page(page)
+		bytes, _, err := b.Page(page)
 		if err != nil {
 			fmt.Println(err)
 			c.Status(http.StatusInternalServerError)
 			return
 		}
-		defer rc.Close()
 
-		c.Stream(func(w io.Writer) bool {
-			_, err := io.CopyN(w, rc, 1024*1024)
-			return err == nil
-		})
+		c.Data(http.StatusOK, "", bytes)
 	})
 
 	router.Run()

@@ -1,7 +1,6 @@
 package book
 
 import (
-	"io"
 	"strings"
 
 	"github.com/gildasch/upspin-bd/book/cbz"
@@ -10,7 +9,7 @@ import (
 )
 
 type Book interface {
-	Page(i int) (io.ReadCloser, bool, error)
+	Page(i int) ([]byte, bool, error)
 	Pages() int
 }
 

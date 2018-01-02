@@ -4,8 +4,10 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/pkg/errors"
 	"upspin.io/upspin"
@@ -14,6 +16,7 @@ import (
 type CBZ struct {
 	*zip.Reader
 	pages []*zip.File
+	mutex *sync.Mutex
 }
 
 func NewCBZ(f io.ReaderAt, size int64) (*CBZ, error) {
@@ -22,7 +25,7 @@ func NewCBZ(f io.ReaderAt, size int64) (*CBZ, error) {
 		return nil, errors.Wrap(err, "could not create zip reader")
 	}
 
-	return &CBZ{Reader: r, pages: pages(r)}, nil
+	return &CBZ{Reader: r, pages: pages(r), mutex: &sync.Mutex{}}, nil
 }
 
 func NewCBZFromUpspin(pathName upspin.PathName,
@@ -101,7 +104,10 @@ func (p byName) Swap(i, j int) {
 	p[i], p[j] = p[j], p[i]
 }
 
-func (c *CBZ) Page(i int) (io.ReadCloser, bool, error) {
+func (c *CBZ) Page(i int) ([]byte, bool, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if len(c.pages) <= i {
 		return nil, false, nil
 	}
@@ -110,8 +116,14 @@ func (c *CBZ) Page(i int) (io.ReadCloser, bool, error) {
 	if err != nil {
 		return nil, true, errors.Wrap(err, "could not open file in cbz")
 	}
+	defer rc.Close()
 
-	return rc, true, nil
+	bytes, err := ioutil.ReadAll(rc)
+	if err != nil {
+		return nil, true, errors.Wrap(err, "could not read whole file in cbz")
+	}
+
+	return bytes, true, nil
 }
 
 func (c *CBZ) Pages() int {
