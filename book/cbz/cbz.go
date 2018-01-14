@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gildasch/upspin-bd/book/types"
 	"github.com/pkg/errors"
 	"upspin.io/upspin"
 )
@@ -58,7 +59,7 @@ func NewCBZFromUpspin(pathName upspin.PathName,
 
 func pages(r *zip.Reader) (pages []*zip.File) {
 	for _, f := range r.File {
-		if isDir(f) {
+		if !types.IsImage(f.FileHeader.Name, isDir(f)) {
 			continue
 		}
 		pages = append(pages, f)

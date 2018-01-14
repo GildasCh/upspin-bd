@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/gildasch/upspin-bd/book/types"
 	"github.com/pkg/errors"
 	"upspin.io/upspin"
 )
@@ -30,6 +31,9 @@ func NewDirFromUpspin(pattern string,
 
 	for _, de := range des {
 		name := de.Name
+		if !types.IsImage(string(name), false) {
+			continue
+		}
 		pages = append(pages, func() (io.ReadCloser, error) {
 			return open(name)
 		})

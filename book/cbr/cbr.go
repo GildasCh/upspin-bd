@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/gildasch/upspin-bd/book/types"
 	rar "github.com/nwaples/rardecode"
 	"github.com/pkg/errors"
 	"upspin.io/upspin"
@@ -33,7 +34,7 @@ func NewCBR(f func() (io.Reader, error)) (*CBR, error) {
 		if err != nil {
 			break
 		}
-		if fh.IsDir {
+		if !types.IsImage(fh.Name, fh.IsDir) {
 			continue
 		}
 		pages++
@@ -81,7 +82,7 @@ func (c *CBR) Page(i int) ([]byte, bool, error) {
 			return nil, true,
 				errors.Wrapf(err, "could not read rar file up to page %d", i)
 		}
-		if fh.IsDir {
+		if !types.IsImage(fh.Name, fh.IsDir) {
 			continue
 		}
 		if n == i {
