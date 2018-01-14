@@ -32,10 +32,12 @@ func main() {
 		b, ok, err := book.NewFromUpspin(c.Param("path"), client, true)
 		if !ok {
 			c.Status(http.StatusBadRequest)
+			fmt.Printf("%q not ok: %v\n", c.Param("path"), err)
 			return
 		}
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
+			fmt.Printf("error getting %q: %v\n", c.Param("path"), err)
 			return
 		}
 

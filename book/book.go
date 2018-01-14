@@ -3,6 +3,7 @@ package book
 import (
 	"strings"
 
+	"github.com/gildasch/upspin-bd/book/cbr"
 	"github.com/gildasch/upspin-bd/book/cbz"
 	"github.com/gildasch/upspin-bd/book/dir"
 	"upspin.io/upspin"
@@ -24,6 +25,10 @@ func NewFromUpspin(path string, client upspin.Client, useCache bool) (b Book, ok
 		// CBZ
 		pathName := upspin.PathName(strings.TrimPrefix(path, "/"))
 		b, ok, err = cbz.NewCBZFromUpspin(pathName, client.Open, client.Lookup)
+	} else if strings.HasSuffix(strings.ToLower(path), ".cbr") {
+		// CBR
+		pathName := upspin.PathName(strings.TrimPrefix(path, "/"))
+		b, ok, err = cbr.NewCBRFromUpspin(pathName, client.Open, client.Lookup)
 	} else {
 		// Directory
 		pattern := extractPattern(path)
