@@ -23,10 +23,6 @@ func NewDirFromUpspin(pattern string,
 		return nil, false, err
 	}
 
-	if len(des) <= 0 {
-		return nil, false, nil
-	}
-
 	pages := []func() (io.ReadCloser, error){}
 
 	for _, de := range des {
@@ -37,6 +33,10 @@ func NewDirFromUpspin(pattern string,
 		pages = append(pages, func() (io.ReadCloser, error) {
 			return open(name)
 		})
+	}
+
+	if len(pages) <= 0 {
+		return nil, false, nil
 	}
 
 	return &Dir{pages: pages}, true, nil
