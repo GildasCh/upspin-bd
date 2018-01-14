@@ -1,6 +1,7 @@
 package book
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gildasch/upspin-bd/book/cbr"
@@ -36,6 +37,35 @@ func NewFromUpspin(path string, client upspin.Client, useCache bool) (b Book, ok
 	}
 
 	cacheUpdate(path, b, ok, err)
+	return
+}
+
+func List(path string, client upspin.Client, useCache bool) (books []string, dirs []string, err error) {
+	pattern := extractPattern(path)
+
+	des, err := client.Glob(pattern)
+	if err != nil {
+		fmt.Println(err)
+		return nil, nil, err
+	}
+
+	for _, de := range des {
+		name := string(de.Name)
+
+		_, ok, err := NewFromUpspin(name, client, useCache)
+		if err != nil {
+			return nil, nil, err
+		}
+		if ok {
+			books = append(books, name)
+			continue
+		}
+
+		if de.IsDir() {
+			dirs = append(dirs, name)
+		}
+	}
+
 	return
 }
 

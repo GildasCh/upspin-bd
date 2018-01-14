@@ -24,7 +24,7 @@ func NewDirFromUpspin(pattern string,
 	}
 
 	if len(des) <= 0 {
-		return nil, false, errors.Errorf("no file matches pattern %q", pattern)
+		return nil, false, nil
 	}
 
 	pages := []func() (io.ReadCloser, error){}

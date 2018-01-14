@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+  </head>
+  <body>
+    <ul>
+      {{ range $book := .books }}
+      <li><a href='/read/{{ $book }}'>{{ $book }}</a></li>
+      {{ end }}
+    </ul>
+
+    <ul>
+      {{ range $dir := .dirs }}
+      <li><a href='/list/{{ $dir }}'>{{ $dir }}</a></li>
+      {{ end }}
+    </ul>
+  </body>
+</html>

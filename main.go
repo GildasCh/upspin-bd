@@ -26,7 +26,21 @@ func main() {
 
 	router.Static("/static", "./static")
 
-	router.LoadHTMLFiles("templates/index.html")
+	router.LoadHTMLFiles("templates/index.html", "templates/list.html")
+
+	router.GET("/list/*path", func(c *gin.Context) {
+		books, dirs, err := book.List(c.Param("path"), client, true)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+			fmt.Printf("error listing %q: %v\n", c.Param("path"), err)
+			return
+		}
+
+		c.HTML(http.StatusOK, "list.html", gin.H{
+			"books": books,
+			"dirs":  dirs,
+		})
+	})
 
 	router.GET("/read/*path", func(c *gin.Context) {
 		b, ok, err := book.NewFromUpspin(c.Param("path"), client, true)
