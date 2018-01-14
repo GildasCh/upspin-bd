@@ -24,9 +24,12 @@ func NewCBR(f func() io.Reader) (*CBR, error) {
 
 	pages := 0
 	for {
-		_, err = r.Next()
+		fh, err := r.Next()
 		if err != nil {
 			break
+		}
+		if fh.IsDir {
+			continue
 		}
 		pages++
 	}
@@ -64,10 +67,13 @@ func (c *CBR) Page(i int) ([]byte, bool, error) {
 
 	n := 0
 	for {
-		_, err := r.Next()
+		fh, err := r.Next()
 		if err != nil {
 			return nil, true,
 				errors.Wrapf(err, "could not read rar file up to page %d", i)
+		}
+		if fh.IsDir {
+			continue
 		}
 		if n == i {
 			break
