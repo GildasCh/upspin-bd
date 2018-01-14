@@ -36,8 +36,19 @@ func main() {
 			return
 		}
 
+		type bookAndThumb struct {
+			Name  string
+			Thumb string
+		}
+
+		bookAndThumbs := []bookAndThumb{}
+		for _, b := range books {
+			bookAndThumbs = append(bookAndThumbs,
+				bookAndThumb{Name: b, Thumb: "/load/" + b + "?page=0"})
+		}
+
 		c.HTML(http.StatusOK, "list.html", gin.H{
-			"books": books,
+			"books": bookAndThumbs,
 			"dirs":  dirs,
 		})
 	})
