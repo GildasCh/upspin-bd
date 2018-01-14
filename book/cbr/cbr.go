@@ -11,12 +11,17 @@ import (
 )
 
 type CBR struct {
-	Reader func() io.Reader
+	Reader func() (io.Reader, error)
 	pages  int
 }
 
-func NewCBR(f func() io.Reader) (*CBR, error) {
-	r, err := rar.NewReader(f(), "")
+func NewCBR(f func() (io.Reader, error)) (*CBR, error) {
+	fr, err := f()
+	if err != nil {
+		return nil, errors.Wrap(err, "could not open upspin file")
+	}
+
+	r, err := rar.NewReader(fr, "")
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create rar reader")
 	}
@@ -40,9 +45,8 @@ func NewCBR(f func() io.Reader) (*CBR, error) {
 func NewCBRFromUpspin(pathName upspin.PathName,
 	open func(name upspin.PathName) (upspin.File, error),
 	lookup func(name upspin.PathName, followFinal bool) (*upspin.DirEntry, error)) (*CBR, bool, error) {
-	freader := func() io.Reader {
-		f, _ := open(pathName)
-		return f
+	freader := func() (io.Reader, error) {
+		return open(pathName)
 	}
 
 	cb, err := NewCBR(freader)
@@ -59,7 +63,12 @@ func (c *CBR) Page(i int) ([]byte, bool, error) {
 		return nil, false, nil
 	}
 
-	r, err := rar.NewReader(c.Reader(), "")
+	fr, err := c.Reader()
+	if err != nil {
+		return nil, true, errors.Wrap(err, "could not open upspin file")
+	}
+
+	r, err := rar.NewReader(fr, "")
 	if err != nil {
 		return nil, true, errors.Wrap(err, "could not create rar reader")
 	}
