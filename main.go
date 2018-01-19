@@ -1,9 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gildasch/upspin-bd/book"
@@ -14,11 +14,17 @@ import (
 )
 
 func main() {
-	cfg, err := config.FromFile(os.Args[1])
+	confPathPtr := flag.String("config", "~/upspin/config", "path to the upspin configuration file")
+	baseURLPtr := flag.String("baseURL", "", "the base URL of the service")
+	flag.Parse()
+
+	cfg, err := config.FromFile(*confPathPtr)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
+	baseURL := *baseURLPtr
 
 	client := client.New(cfg)
 
@@ -48,8 +54,9 @@ func main() {
 		}
 
 		c.HTML(http.StatusOK, "list.html", gin.H{
-			"books": bookAndThumbs,
-			"dirs":  dirs,
+			"books":   bookAndThumbs,
+			"dirs":    dirs,
+			"baseURL": baseURL,
 		})
 	})
 
@@ -75,6 +82,7 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"resource": "/load" + c.Param("path"),
 			"pages":    pages,
+			"baseURL":  baseURL,
 		})
 	})
 

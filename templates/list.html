@@ -1,18 +1,18 @@
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <link rel="stylesheet" type="text/css" href="{{ .baseURL }}/static/style.css">
   </head>
   <body>
     <ul class='mosaic'>
       {{ range $book := .books }}
-      <li><a href='/read/{{ $book.Name }}'><img src='{{ $book.Thumb }}' /></a></li>
+      <li><a href='{{ $.baseURL }}/read/{{ $book.Name }}'><img src='{{ $.baseURL }}{{ $book.Thumb }}' /></a></li>
       {{ end }}
     </ul>
 
     <p>Sub directories:</p>
     <ul>
       {{ range $dir := .dirs }}
-      <li><a href='/list/{{ $dir }}'>{{ $dir }}</a></li>
+      <li><a href='{{ $.baseURL }}/list/{{ $dir }}'>{{ $dir }}</a></li>
       {{ end }}
     </ul>
   </body>
