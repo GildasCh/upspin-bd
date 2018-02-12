@@ -54,7 +54,8 @@ func List(path string, client upspin.Client, useCache bool) (books []string, dir
 
 		_, ok, err := NewFromUpspin(name, client, useCache)
 		if err != nil {
-			return nil, nil, err
+			fmt.Printf("Error reading %q, skipping. Error: %v\n", name, err)
+			continue
 		}
 		if ok {
 			books = append(books, name)
