@@ -30,6 +30,9 @@ func NewFromUpspin(path string, client upspin.Client, useCache bool) (b Book, ok
 		// CBR
 		pathName := upspin.PathName(strings.TrimPrefix(path, "/"))
 		b, ok, err = cbr.NewCBRFromUpspin(pathName, client.Open, client.Lookup)
+		if err != nil {
+			b, ok, err = cbz.NewCBZFromUpspin(pathName, client.Open, client.Lookup)
+		}
 	} else {
 		// Directory
 		pattern := extractPattern(path)
